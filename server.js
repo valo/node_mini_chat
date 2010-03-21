@@ -42,6 +42,8 @@ Connection.prototype = {
   route: function(){
     var connection = this, path = connection.url_info.pathname;
 
+    sys.puts(connection.req.method+' '+path);
+
     if (path in Routes)
       Routes[path](connection);
     else {
