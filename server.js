@@ -151,7 +151,7 @@ channel.publishes = ["join", "part", "new_message"];
 
 //server-only
 
-for (var i = channel.publishes - 1; i >= 0; i--) 
+for (var i = channel.publishes.length - 1; i >= 0; i--)
   (function(kind) {
     channel.addListener(kind, function(nick){ 
       publish({type: kind, nick: nick, data: ''}); 
