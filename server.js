@@ -144,8 +144,8 @@ Users = {
 
   part: function(session_id){
     var nick = sessions_nicks[session_id];
-    delete sessions_nicks[session_id];
-    delete nicks_sessions[nick];
+    delete this.sessions_nicks[session_id];
+    delete this.nicks_sessions[nick];
     return nick;
   }
 };
