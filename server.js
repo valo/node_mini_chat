@@ -108,6 +108,7 @@ Routes["/join"] = function (connection){
 
   session = Users.join(nick, session_id);
   channel.join(session.nick);
+  channel.addMessage( 'CHANNEL BOT', nick+' just joined' );
   connection.json(session);
 };
 
