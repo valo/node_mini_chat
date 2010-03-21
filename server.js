@@ -143,7 +143,7 @@ Users = {
   },
 
   part: function(session_id){
-    var nick = sessions_nicks[session_id];
+    var nick = this.sessions_nicks[session_id];
     delete this.sessions_nicks[session_id];
     delete this.nicks_sessions[nick];
     return nick;
