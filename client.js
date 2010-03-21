@@ -45,13 +45,35 @@
         if (request.status !== 200) return this.error(request, textStatus);
 
         for (var i=0; i < messages.length; i++){
-          logs.append($(
-            '<li title="sent at: '+new Date(messages[i].timestamp)+'">'+
-              '<span class="nick">'+messages[i].nick+'</span>: '+
-              '<span class="message">'+messages[i].data+'</span>'+
-            '</li>'
-          ));
           last_message_timestamp = messages[i].timestamp;
+
+          if (messages[i].type === "message"){
+            logs.append($(
+              '<li title="sent at: '+new Date(messages[i].timestamp)+'">'+
+                '<span class="nick">'+messages[i].nick+'</span>: '+
+                '<span class="message">'+messages[i].data+'</span>'+
+              '</li>'
+            ));
+          }
+
+          if (messages[i].type === "join"){
+            logs.append($(
+              '<li title="joined at: '+new Date(messages[i].timestamp)+'">'+
+                '<span class="nick">'+messages[i].nick+'</span>: '+
+                '<span class="message">just joined</span>'+
+              '</li>'
+            ));
+          }
+
+          if (messages[i].type === "leave"){
+            logs.append($(
+              '<li title="left at: '+new Date(messages[i].timestamp)+'">'+
+                '<span class="nick">'+messages[i].nick+'</span>: '+
+                '<span class="message">just left</span>'+
+              '</li>'
+            ));
+          }
+
         }
 
         waitForNewMessages();
@@ -65,6 +87,11 @@
 
   $(document).ready(function(){
     $('#nick input[type="text"]').focus();
+  });
+
+  //if we can, notify the server that we're going away.
+  $(window).unload(function () {
+    jQuery.get("/leave", {session_id: session_id}, function (data) { }, "json");
   });
 
 
