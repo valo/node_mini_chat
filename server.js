@@ -32,7 +32,7 @@ Connection.prototype = {
     code || (code = 200);
 
     sys.puts(JSON.stringify(obj));
-    this.respond(code, JSON.stringify(obj), "text/json");
+    this.respond(code, JSON.stringify(obj), "application/json");
   },
 
   notFound: function() {

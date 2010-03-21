@@ -29,7 +29,12 @@
         console.info(messages.length, 'NEW MESSAGES', messages);
         var logs = $('#logs ul');
         for (var i=0; i < messages.length; i++) {
-          logs.append( $('<li>'+messages[i]+'</li>') );
+          logs.append($(
+            '<li>'+
+              '<span class="nick">'+messages[i].nick+'</span>: '+
+              '<span class="message">'+messages[i].data+'</span>'+
+            '</li>'
+          ));
         };
 
         waitForNewMessages();
