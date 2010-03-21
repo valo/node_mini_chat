@@ -69,6 +69,8 @@ function listen(connection){
 
 server = createServer(Connection);
 server.listen(PORT, HOST);
+sys.puts("Server at http://" + (HOST || "127.0.0.1") + ":" + PORT + "/");
+
 long_connections = [];
 
 channel = new events.EventEmitter;
