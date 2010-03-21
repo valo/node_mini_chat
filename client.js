@@ -2,19 +2,23 @@
 
   var nick, session_id;
 
-  $(document).delegate('#nick input[type="button"]', 'click', function(event){
+  $(document).delegate('#nick', 'submit', function(event){
+    event.preventDefault();
+
     nick = $('#nick input[type="text"]').val();
     session_id = Math.random();
 
     $.get('/join', {nick:nick, session_id: session_id}, function(){
 
       $('#nick').hide();
-      $('#logs, textarea').show();
+      $('#logs, textarea').show().last().focus();
 
       waitForNewMessages();
     });
 
+
   });
+
 
   $(document).delegate('textarea', 'keypress', function(event){
     if (event.which !== 13) return true;
@@ -58,5 +62,10 @@
       }
     });
   }
+
+  $(document).ready(function(){
+    $('#nick input[type="text"]').focus();
+  });
+
 
 })();
