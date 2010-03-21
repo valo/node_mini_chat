@@ -19,16 +19,13 @@
 
   });
 
-
   $(document).delegate('textarea', 'keypress', function(event){
     if (event.which !== 13) return true;
     var self = $(this), message = self.val();
 
     self.val('');
 
-    $.get('/speak', {statement: message, session_id: session_id}, function(){
-      console.info(this, arguments);
-    });
+    $.get('/speak', {statement: message, session_id: session_id});
 
     event.preventDefault();
     return false;
@@ -58,8 +55,8 @@
 
           if (messages[i].type === "join"){
             logs.append($(
-              '<li title="joined at: '+new Date(messages[i].timestamp)+'">'+
-                '<span class="nick">'+messages[i].nick+'</span>: '+
+              '<li class="join" title="joined at: '+new Date(messages[i].timestamp)+'">'+
+                '<span class="nick">'+messages[i].nick+'</span> '+
                 '<span class="message">just joined</span>'+
               '</li>'
             ));
@@ -67,8 +64,8 @@
 
           if (messages[i].type === "leave"){
             logs.append($(
-              '<li title="left at: '+new Date(messages[i].timestamp)+'">'+
-                '<span class="nick">'+messages[i].nick+'</span>: '+
+              '<li class="leave" title="left at: '+new Date(messages[i].timestamp)+'">'+
+                '<span class="nick">'+messages[i].nick+'</span> '+
                 '<span class="message">just left</span>'+
               '</li>'
             ));
