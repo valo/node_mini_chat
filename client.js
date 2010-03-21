@@ -30,26 +30,25 @@
     return false;
   });
 
-  var last_polled = 0; //get from server.
+  var last_message_timestamp = 0; //get from server.
   function waitForNewMessages(){
-    console.log('WFNM');
+
+    var logs = $('#logs ul');
 
     $.ajax({
-      url: '/listen?last_polled='+last_polled,
+      url: '/listen?since='+last_message_timestamp,
       success: function(messages, textStatus, request){
         if (request.status !== 200) return this.error(request, textStatus);
 
-        last_polled = (new Date).getTime();
-        console.info(messages.length, 'NEW MESSAGES', messages);
-        var logs = $('#logs ul');
-        for (var i=0; i < messages.length; i++) {
+        for (var i=0; i < messages.length; i++){
           logs.append($(
-            '<li>'+
+            '<li title="sent at: '+new Date(messages[i].timestamp)+'">'+
               '<span class="nick">'+messages[i].nick+'</span>: '+
               '<span class="message">'+messages[i].data+'</span>'+
             '</li>'
           ));
-        };
+          last_message_timestamp = messages[i].timestamp;
+        }
 
         waitForNewMessages();
       },
