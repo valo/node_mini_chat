@@ -86,6 +86,11 @@ Routes["/join"] = function (connection){
   connection.json(session);
 };
 
+Routes["/part"] = function (connection){
+  var nick = Users.part(connection.url_info.query.session_id);
+  channel.part(nick);
+};
+
 Routes["/who"] = function (connection){
   connection.json(channel.nicks);
 };
@@ -110,6 +115,13 @@ Users = {
     this.nicks_sessions[nick] = session_id;
     this.sessions_nicks[session_id] = nick;
     return { nick: nick, session_id: session_id };
+  },
+  
+  part: function(session_id){
+    var nick = sessions_nicks[session_id];
+    delete sessions_nicks[session_id];
+    delete nicks_sessions[nick];
+    return nick;
   }
 };
 
@@ -118,7 +130,16 @@ channel.message_log = [];
 channel.message_log.length = 100;
 channel.nicks = [];
 
-channel.join = function (nick){ channel.nicks.push(nick); };
+channel.join = function (nick){ 
+  channel.nicks.push(nick); 
+  this.emit("join", nick);
+};
+
+channel.part = function (nick){ 
+  var idx = nicks.indexOf(nick);
+  this.emit("part", nick);
+  return channel.nicks.splice(idx, 1); 
+};
 
 channel.addMessage = function(message){
   this.message_log.shift();
@@ -126,8 +147,19 @@ channel.addMessage = function(message){
   this.emit("new_message", message);
 };
 
-channel.addListener("new_message", function(message){
+channel.publishes = ["join", "part", "new_message"];
+
+//server-only
+
+for (var i = channel.publishes - 1; i >= 0; i--) 
+  (function(kind) {
+    channel.addListener(kind, function(nick){ 
+      publish({type: kind, nick: nick, data: ''}); 
+    });
+  })(channel.publishes[i]);
+
+function publish(message){
   for (var i = long_connections.length - 1; i >= 0; i--){
     long_connections.pop().json([message]);
   };
-});
+};
