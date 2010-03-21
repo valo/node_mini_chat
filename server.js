@@ -89,7 +89,7 @@ Routes["/speak"] = function (connection){
   var nick = Users.sessions_nicks[connection.params.session_id] ||
                 connection.req.connection.remoteAddress;
 
-  channel.addMessage( nick, connection.params.statement );
+  channel.message( nick, connection.params.statement );
   connection.json({});
 };
 
@@ -108,13 +108,12 @@ Routes["/join"] = function (connection){
 
   session = Users.join(nick, session_id);
   channel.join(session.nick);
-  channel.addMessage( 'CHANNEL BOT', nick+' just joined' );
   connection.json(session);
 };
 
-Routes["/part"] = function (connection){
+Routes["/leave"] = function (connection){
   var nick = Users.part(connection.params.session_id);
-  channel.part(nick);
+  channel.leave(nick);
 };
 
 Routes["/who"] = function (connection){
@@ -161,21 +160,20 @@ channel.join = function (nick){
   this.emit("join", nick);
 };
 
-channel.part = function (nick){
+channel.leave = function (nick){
   var idx = nicks.indexOf(nick);
-  this.emit("part", nick);
+  this.emit("leave", nick);
   return channel.nicks.splice(idx, 1);
 };
 
-channel.addMessage = function(nick, message){
-  this.emit("new_message", nick, message);
+channel.message = function(nick, message){
+  this.emit("message", nick, message);
 };
 
 
-channel.publishes = ["join", "part", "new_message"];
+channel.publishes = ["join", "part", "message"];
 
 //server-only
-
 channel.messagesSince = function(since){
   var msgs = [];
   for (var i = this.message_log.length - 1; i >= 0; i--){
