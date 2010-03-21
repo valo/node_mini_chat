@@ -66,6 +66,24 @@ Routes["/"] = function (connection) {
   });
 };
 
+Routes["/application.js"] = function (connection) {
+  var client_js_files = ['event_emitter', 'channel', 'client'];
+  var application_js = '';
+
+  function concatFile(){
+    if (client_js_files.length){
+      readFile('./'+client_js_files.shift()+'.js', 'utf8', function(err, data) {
+        application_js += data+"\n";
+        concatFile();
+      });
+    }else{
+      connection.respond(200, application_js, "text/javascript");
+    }
+  }
+
+  concatFile();
+};
+
 Routes["/speak"] = function (connection){
   channel.addMessage(connection.req.connection.remoteAddress +
     " "+ connection.url_info.query.statement );
