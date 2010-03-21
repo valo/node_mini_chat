@@ -58,7 +58,8 @@ function home(connection) {
 };
 
 function speak(connection){
-  channel.addMessage( connection.url_info.query.statement );
+  channel.addMessage(connection.req.connection.remoteAddress + 
+    " "+ connection.url_info.query.statement );
   connection.json({});
 };
 
