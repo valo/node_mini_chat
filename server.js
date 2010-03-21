@@ -67,8 +67,10 @@ Routes["/"] = function (connection) {
 };
 
 Routes["/speak"] = function (connection){
-  channel.addMessage(connection.req.connection.remoteAddress +
-    " "+ connection.url_info.query.statement );
+  var nick = Users.sessions_nicks[connection.url_info.query.session_id] ||
+                connection.req.connection.remoteAddress;
+
+  channel.addMessage( nick, connection.url_info.query.statement );
   connection.json({});
 };
 
@@ -79,7 +81,7 @@ Routes["/listen"] = function (connection){
 Routes["/join"] = function (connection){
   var params = connection.url_info.query,
       nick = params.nick,
-      session_id = params.session;
+      session_id = params.session_id;
 
   session = Users.join(nick, session_id);
   channel.join(session.nick);
@@ -116,7 +118,7 @@ Users = {
     this.sessions_nicks[session_id] = nick;
     return { nick: nick, session_id: session_id };
   },
-  
+
   part: function(session_id){
     var nick = sessions_nicks[session_id];
     delete sessions_nicks[session_id];
@@ -130,21 +132,21 @@ channel.message_log = [];
 channel.message_log.length = 100;
 channel.nicks = [];
 
-channel.join = function (nick){ 
-  channel.nicks.push(nick); 
+channel.join = function (nick){
+  channel.nicks.push(nick);
   this.emit("join", nick);
 };
 
-channel.part = function (nick){ 
+channel.part = function (nick){
   var idx = nicks.indexOf(nick);
   this.emit("part", nick);
-  return channel.nicks.splice(idx, 1); 
+  return channel.nicks.splice(idx, 1);
 };
 
-channel.addMessage = function(message){
+channel.addMessage = function(nick, message){
   this.message_log.shift();
   this.message_log.push(message);
-  this.emit("new_message", message);
+  this.emit("new_message", nick, message);
 };
 
 channel.publishes = ["join", "part", "new_message"];
@@ -153,8 +155,14 @@ channel.publishes = ["join", "part", "new_message"];
 
 for (var i = channel.publishes.length - 1; i >= 0; i--)
   (function(kind) {
-    channel.addListener(kind, function(nick){ 
-      publish({type: kind, nick: nick, data: ''}); 
+    channel.addListener(kind, function(nick, data){
+      data || (data = '');
+      publish({
+        type: kind,
+        nick: nick,
+        data: data,
+        timestamp: (new Date).getTime()
+      });
     });
   })(channel.publishes[i]);
 
