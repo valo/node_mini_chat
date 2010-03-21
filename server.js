@@ -59,30 +59,24 @@ Connection.prototype = {
 };
 
 Routes = {};
-Routes["/"] = home;
-Routes["/speak"] = speak;
-Routes["/listen"] = listen;
-Routes["/join"] = join;
-Routes["/who"] = who;
-Routes["/echo"] = function(cxn) { cxn.json(cxn.url_info.query); };
 
-function home(connection) {
+Routes["/"] = function (connection) {
   readFile('index.html', 'utf8', function(err, data) {
     connection.respond(200, data, "text/html");
   });
 };
 
-function speak(connection){
+Routes["/speak"] = function (connection){
   channel.addMessage(connection.req.connection.remoteAddress +
     " "+ connection.url_info.query.statement );
   connection.json({});
 };
 
-function listen(connection){
+Routes["/listen"] = function (connection){
   long_connections.push(connection);
 };
 
-function join(connection){
+Routes["/join"] = function (connection){
   var params = connection.url_info.query,
       nick = params.nick,
       session_id = params.session;
@@ -90,11 +84,11 @@ function join(connection){
   session = Users.join(nick, session_id);
   channel.join(session.nick);
   connection.json(session);
-}
+};
 
-function who(connection){
+Routes["/who"] = function (connection){
   connection.json(channel.nicks);
-}
+};
 
 server = createServer(Connection);
 server.listen(PORT, HOST);
