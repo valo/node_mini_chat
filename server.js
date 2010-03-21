@@ -103,10 +103,7 @@ Routes["/listen"] = function (connection){
 };
 
 Routes["/join"] = function (connection){
-  var nick = connection.params.nick,
-      session_id = connection.params.session_id;
-
-  session = Users.join(nick, session_id);
+  var session = Users.join(connection.params.nick, connection.params.session_id);
   channel.join(session.nick);
   connection.json(session);
 };
@@ -161,50 +158,34 @@ channel.join = function (nick){
 };
 
 channel.leave = function (nick){
-  var idx = this.nicks.indexOf(nick);
+  this.nicks.splice(this.nicks.indexOf(nick), 1);
   this.emit("leave", nick);
-  return this.nicks.splice(idx, 1);
+  return nick;
 };
 
 channel.message = function(nick, message){
   this.emit("message", nick, message);
 };
 
-
-channel.publishes = ["join", "leave", "message"];
-
-//server-only
 channel.messagesSince = function(since){
-  var msgs = [];
-  for (var i = this.message_log.length - 1; i >= 0; i--){
-    var msg = this.message_log[i];
-    if(msg && msg.timestamp > since){
-      msgs.unshift(msg); 
-    }
-  };
-  
-  return msgs;
+  return this.message_log.filter(function(msg){
+    return msg && msg.timestamp > since;
+  });
 };
 
-for (var i = channel.publishes.length - 1; i >= 0; i--)
-  (function(kind) {
-    channel.addListener(kind, function(nick, data){
-      data || (data = '');
-      var history_item = {
-        type: kind,
-        nick: nick,
-        data: data,
-        timestamp: (new Date).getTime()
-      };
-      
-      publish(history_item);
-      channel.message_log.shift();
-      channel.message_log.push(history_item);
-    });
-  })(channel.publishes[i]);
+["join", "leave", "message"].forEach(function(kind) {
+  channel.addListener(kind, function(nick, data){
+    data || (data = '');
+    var history_item = {
+      type: kind,
+      nick: nick,
+      data: data,
+      timestamp: (new Date).getTime()
+    };
 
-function publish(message){
-  for (var i = long_connections.length - 1; i >= 0; i--){
-    long_connections.pop().json( [message] );
-  };
-};
+    while(long_connections.length) long_connections.pop().json([history_item]);
+
+    channel.message_log.shift();
+    channel.message_log.push(history_item);
+  });
+});
