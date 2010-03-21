@@ -40,20 +40,17 @@ Connection.prototype = {
   },
 
   route: function(){
-    var connection = this;
-    var path = "." + connection.url_info.pathname;
-    puts("path: "+ path);
+    var connection = this, path = connection.url_info.pathname;
 
     if (path in Routes)
       Routes[path](connection);
     else {
-      puts(path);
-      readFile(path, 'utf8', function(err, data){
-        if(err){ connection.notFound(); return; }
-
-        type = path.split('.').slice(-1);
-        puts(type);
-        connection.respond(200, data, "text/"+type);
+      readFile('.'+path, 'utf8', function(err, data){
+        if (err) {
+          connection.notFound();
+        }else{
+          connection.respond(200, data, "text/"+path.split('.').slice(-1));
+        }
       });
     }
   }
