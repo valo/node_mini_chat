@@ -1,20 +1,23 @@
-function EventEmitter(){
-  this._listeners = {};
-}
-EventEmitter.prototype.addListener = function addListener(type, handler){
-  this._listeners[type] || (this._listeners[type] = []);
-  this._listeners[type].push(handler);
-  return this;
-};
-EventEmitter.prototype.emit = function emit(type, data){
-  var handlers = this._listeners[type];
+(function(exports) {
 
-  if (handlers) for (var i=0; i < handlers.length; i++) (function(handler) {
-    setTimeout(function(){ handler.call(this, this, data); }, 1);
-  })(handlers[i]);
+  function EventEmitter(){
+    this._listeners = {};
+  }
+  EventEmitter.prototype.addListener = function addListener(type, handler){
+    this._listeners[type] || (this._listeners[type] = []);
+    this._listeners[type].push(handler);
+    return this;
+  };
+  EventEmitter.prototype.emit = function emit(type, data){
+    var handlers = this._listeners[type];
 
-  return this;
-};
+    if (handlers) for (var i=0; i < handlers.length; i++) (function(handler) {
+      setTimeout(function(){ handler.call(this, this, data); }, 1);
+    })(handlers[i]);
 
-if (typeof exports !== "undefined")
+    return this;
+  };
+
   exports.EventEmitter = EventEmitter;
+
+})(typeof exports === "undefined" ? this : exports);
