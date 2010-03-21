@@ -20,12 +20,23 @@
    #header{
      height: 50px;
    }
-   #logs{
+   #nick, #logs{
      position: fixed;
      top: 50px;
      width:100%;
-     bottom: 100px;
+
      overflow: hidden;
+
+   }
+   #nick{
+     bottom: 0;
+     padding-top: 3em;
+     text-align: center;
+     background-color: white;
+   }
+   #logs{
+     display: none;
+     bottom: 100px;
      background-color: grey;
    }
    #logs ul{
@@ -35,6 +46,7 @@
      right: 0;
    }
    textarea{
+     display: none;
      position: fixed;
      height: 100px;
      width: 100%;
@@ -47,9 +59,14 @@
   <script src="/application.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
-  <div id="">
   <div id="header">
     <h1>Chatter Box</h1>
+  </div>
+  <div id="nick">
+    <label>Nick:
+      <input type="text" value="" />
+    </label>
+    <input type="button" value="login" />
   </div>
   <div id="logs">
     <ul></ul>

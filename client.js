@@ -1,6 +1,20 @@
 (function() {
 
-  var channel = new Channel;
+  var nick, session_id;
+
+  $(document).delegate('#nick input[type="button"]', 'click', function(event){
+    nick = $('#nick input[type="text"]').val();
+    session_id = Math.random();
+
+    $.get('/join', {nick:nick, session_id: session_id}, function(){
+
+      $('#nick').hide();
+      $('#logs, textarea').show();
+
+      waitForNewMessages();
+    });
+
+  });
 
   $(document).delegate('textarea', 'keypress', function(event){
     if (event.which !== 13) return true;
@@ -8,7 +22,7 @@
 
     self.val('');
 
-    $.get('/speak', {statement: message}, function(){
+    $.get('/speak', {statement: message, session_id: session_id}, function(){
       console.info(this, arguments);
     });
 
@@ -39,12 +53,11 @@
 
         waitForNewMessages();
       },
-    error: function(XMLHttpRequest, textStatus){
+      error: function(XMLHttpRequest, textStatus){
         console.warn('ERROR REC MESGS', this, arguments);
         setTimeout(waitForNewMessages, 10000);
       }
     });
   }
-  waitForNewMessages();
 
 })();
