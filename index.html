@@ -45,44 +45,47 @@
 	</style>
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript" charset="utf-8">
-    $(document).delegate('textarea', 'keypress', function(event){
-      if (event.which !== 13) return true;
-      var self = $(this), message = self.val();
+    (function() {
       
-      self.val('');
+      $(document).delegate('textarea', 'keypress', function(event){
+        if (event.which !== 13) return true;
+        var self = $(this), message = self.val();
       
-      $.get('/speak', {statement: message}, function(){
-        console.info(this, arguments);
+        self.val('');
+
+        $.get('/speak', {statement: message}, function(){
+          console.info(this, arguments);
+        });
+      
+        event.preventDefault();
+        return false;
       });
-      
-      event.preventDefault();
-      return false;
-    });
 
-    var last_polled = 0; //get from server.
-    function waitForNewMessages(){
-      console.log('WFNM');
+      var last_polled = 0; //get from server.
+      function waitForNewMessages(){
+        console.log('WFNM');
 
-      $.ajax({
-        url: '/listen?last_polled='+last_polled,
-        success: function(messages){
-          last_polled = (new Date).getTime();
-          console.info(messages.length, 'NEW MESSAGES', messages);
-          var logs = $('#logs ul');
-          for (var i=0; i < messages.length; i++) {
-            logs.append( $('<li>'+messages[i]+'</li>') );
-          };
+        $.ajax({
+          url: '/listen?last_polled='+last_polled,
+          success: function(messages){
+            last_polled = (new Date).getTime();
+            console.info(messages.length, 'NEW MESSAGES', messages);
+            var logs = $('#logs ul');
+            for (var i=0; i < messages.length; i++) {
+              logs.append( $('<li>'+messages[i]+'</li>') );
+            };
           
-          waitForNewMessages();
-        },
-        error: function(){
-          console.warn('ERROR REC MESGS', this, arguments);
-          setTimeout(waitForNewMessages, 10000);
-        }
-      });
-    }
-    waitForNewMessages();
+            waitForNewMessages();
+          },
+          error: function(){
+            console.warn('ERROR REC MESGS', this, arguments);
+            setTimeout(waitForNewMessages, 10000);
+          }
+        });
+      }
+      waitForNewMessages();
     
+    })();
   </script>
 </head>
 <body>
