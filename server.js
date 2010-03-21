@@ -13,6 +13,7 @@ function Connection(request, response) {
   this.req = request;
   this.res = response;
   this.url_info = url.parse(this.req.url, true);
+  this.params = this.url_info.query;
 
   this.route();
   return this;
@@ -85,20 +86,24 @@ Routes["/application.js"] = function (connection) {
 };
 
 Routes["/speak"] = function (connection){
-  var nick = Users.sessions_nicks[connection.url_info.query.session_id] ||
+  var nick = Users.sessions_nicks[connection.params.session_id] ||
                 connection.req.connection.remoteAddress;
 
-  channel.addMessage( nick, connection.url_info.query.statement );
+  channel.addMessage( nick, connection.params.statement );
   connection.json({});
 };
 
 Routes["/listen"] = function (connection){
-  long_connections.push(connection);
+  var since = parseInt(connection.params.since || 0, 10);
+  messages = channel.messagesSince(since);
+  if(messages.length > 0 )
+    connection.json(messages);
+  else
+    long_connections.push(connection);
 };
 
 Routes["/join"] = function (connection){
-  var params = connection.url_info.query,
-      nick = params.nick,
+  var nick = params.nick,
       session_id = params.session_id;
 
   session = Users.join(nick, session_id);
@@ -107,7 +112,7 @@ Routes["/join"] = function (connection){
 };
 
 Routes["/part"] = function (connection){
-  var nick = Users.part(connection.url_info.query.session_id);
+  var nick = Users.part(connection.params.session_id);
   channel.part(nick);
 };
 
@@ -162,30 +167,45 @@ channel.part = function (nick){
 };
 
 channel.addMessage = function(nick, message){
-  this.message_log.shift();
-  this.message_log.push(message);
   this.emit("new_message", nick, message);
 };
+
 
 channel.publishes = ["join", "part", "new_message"];
 
 //server-only
 
+channel.messagesSince = function(since){
+  var msgs = [];
+  for (var i = this.message_log.length - 1; i >= 0; i--){
+    var msg = this.message_log[i];
+    if(msg && msg.timestamp > since){
+      msgs.unshift(msg); 
+    }
+  };
+  
+  return msgs;
+};
+
 for (var i = channel.publishes.length - 1; i >= 0; i--)
   (function(kind) {
     channel.addListener(kind, function(nick, data){
       data || (data = '');
-      publish({
+      var history_item = {
         type: kind,
         nick: nick,
         data: data,
         timestamp: (new Date).getTime()
-      });
+      };
+      
+      publish(history_item);
+      channel.message_log.shift();
+      channel.message_log.push(history_item);
     });
   })(channel.publishes[i]);
 
 function publish(message){
   for (var i = long_connections.length - 1; i >= 0; i--){
-    long_connections.pop().json([message]);
+    long_connections.pop().json( [message] );
   };
 };
