@@ -9,8 +9,9 @@ EventEmitter.prototype.addListener = function addListener(type, handler){
 EventEmitter.prototype.emit = function emit(type, data){
   var handlers = this._listeners[type];
 
-  if (handlers) for (var i=0; i < handlers.length; i++)
-    handlers[i].call(this, this, data);
+  if (handlers) for (var i=0; i < handlers.length; i++) (function(handler) {
+    setTimeout(function(){ handler.call(this, this, data); }, 1);
+  })(handlers[i]);
 
   return this;
 };
