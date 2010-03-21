@@ -103,8 +103,8 @@ Routes["/listen"] = function (connection){
 };
 
 Routes["/join"] = function (connection){
-  var nick = params.nick,
-      session_id = params.session_id;
+  var nick = connection.params.nick,
+      session_id = connection.params.session_id;
 
   session = Users.join(nick, session_id);
   channel.join(session.nick);
