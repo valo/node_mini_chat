@@ -63,6 +63,7 @@ Routes["/"] = home;
 Routes["/speak"] = speak;
 Routes["/listen"] = listen;
 Routes["/join"] = join;
+Routes["/who"] = who;
 Routes["/echo"] = function(cxn) { cxn.json(cxn.url_info.query); };
 
 function home(connection) {
@@ -86,8 +87,13 @@ function join(connection){
       nick = params.nick,
       session_id = params.session;
 
-  result = channel.join(nick, session_id);
-  connection.json(result);
+  session = Users.join(nick, session_id);
+  channel.join(session.nick);
+  connection.json(session);
+}
+
+function who(connection){
+  connection.json(channel.nicks);
 }
 
 server = createServer(Connection);
@@ -109,6 +115,7 @@ Users = {
 
     this.nicks_sessions[nick] = session_id;
     this.sessions_nicks[session_id] = nick;
+    return { nick: nick, session_id: session_id };
   }
 };
 
