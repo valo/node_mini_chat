@@ -109,8 +109,11 @@ Routes["/join"] = function (connection){
 };
 
 Routes["/leave"] = function (connection){
-  var nick = Users.part(connection.params.session_id);
-  channel.leave(nick);
+  if(connection.params.session_id){
+    var nick = Users.part(connection.params.session_id);
+    channel.leave(nick);
+    connection.res.close();
+  }
 };
 
 Routes["/who"] = function (connection){
