@@ -161,9 +161,9 @@ channel.join = function (nick){
 };
 
 channel.leave = function (nick){
-  var idx = nicks.indexOf(nick);
+  var idx = this.nicks.indexOf(nick);
   this.emit("leave", nick);
-  return channel.nicks.splice(idx, 1);
+  return this.nicks.splice(idx, 1);
 };
 
 channel.message = function(nick, message){
@@ -171,7 +171,7 @@ channel.message = function(nick, message){
 };
 
 
-channel.publishes = ["join", "part", "message"];
+channel.publishes = ["join", "leave", "message"];
 
 //server-only
 channel.messagesSince = function(since){
