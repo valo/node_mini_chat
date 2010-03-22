@@ -6,66 +6,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>200 SLOC Chat</title>
 	<meta name="author" content="Jared Grippe; Aaron Blohowiak">
-	<style type="text/css" media="screen">
-   * {
-     padding: 0;
-     margin: 0;
-     font-family: helvetica, sans-serif;
-   }
-	 html, body{
-     height: 100%;
-     width: 100%;
-     overflow: hidden;
-   }
-   #header{
-     height: 50px;
-   }
-   #nick, #logs{
-     position: fixed;
-     top: 50px;
-     width:100%;
 
-     overflow: hidden;
-
-   }
-   #nick{
-     bottom: 0;
-     padding-top: 3em;
-     text-align: center;
-     background-color: white;
-   }
-   #logs{
-     display: none;
-     bottom: 100px;
-     background-color: grey;
-   }
-   #logs ul{
-     position: absolute;
-     bottom: 0;
-     left: 0;
-     right: 0;
-   }
-   #logs ul li{
-
-   }
-   #logs ul li.message{
-
-   }
-   #logs ul li.join, #logs ul li.leave{
-     color: #4D4D4D;
-     font-style: italic;
-   }
-
-   textarea{
-     display: none;
-     position: fixed;
-     height: 100px;
-     width: 100%;
-     left: 0;
-     right: 0;
-     bottom: 0;
-   }
-	</style>
+  <link rel="stylesheet" href="/screen.css" type="text/css" media="screen" title="no title" charset="utf-8" />
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js" type="text/javascript" charset="utf-8"></script>
   <script src="/application.js" type="text/javascript" charset="utf-8"></script>
 </head>
@@ -75,7 +17,9 @@
   </div>
   <form id="nick">
     <p>
-    This is a chat room. Both the client-side and server-side are written in javascript. The source code is <a href="http://github.com/aaronblohowiak/node_mini_chat">here</a>. </p>
+      This is a chat room. Both the client-side and server-side are written in javascript. The source code is
+      <a href="http://github.com/aaronblohowiak/node_mini_chat">here</a>.
+    </p>
     <label>Nick:
       <input type="text" value="" />
     </label>
