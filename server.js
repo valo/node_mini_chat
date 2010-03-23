@@ -63,7 +63,6 @@ Connection.prototype = {
   respond: function(status, body, type) {
     var header = [ ["Content-Type", type], ["Content-Length", body.length] ];
     this.res.sendHeader(status, header);
-    puts("responding with:" + body);
     this.res.write(body);
     this.res.close();
   },
@@ -79,8 +78,6 @@ Connection.prototype = {
 
   route: function(){
     var connection = this, path = connection.url_info.pathname;
-
-    puts(" routing [PATH]: "+path);
     
     if (path in Routes)
       Routes[path](connection);
@@ -160,7 +157,6 @@ Routes["/join"] = function (connection){
 //  closes connection without response
 Routes["/leave"] = function (connection){
   if(connection.params && connection.params.session_id){
-    puts("trying to leave:" + sys.inspect(connection.params));
     var nick = Users.part(connection.params.session_id);
     channel.leave(nick);
     connection.res.close();
@@ -236,9 +232,6 @@ channel.message = function(nick, message){
 //  adds the events to the history
 ["join", "leave", "message"].forEach(function(kind) {
   channel.addListener(kind, function(nick, data){
-    puts("in listener [nick]:" + nick);
-    puts("in listener [data]:" + data);
-    puts("in listener [kind]:" + kind);
     data || (data = '');
     var history_item = {
       type: kind,
