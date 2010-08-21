@@ -28,13 +28,22 @@
    background-color: white;
  }
  
+ #channel {
+   float: right;
+   width: 150px;
+ }
+ 
+ #channel ul {
+   list-style-type: none;
+ }
+ 
  #logs br{
    clear:both;
  }
  
  #logs{
    display: none;
-   bottom: 100px;
+   bottom: 110px;
  }
  #logs ul{
    position: absolute;

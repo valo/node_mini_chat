@@ -103,7 +103,7 @@ Routes["/"] = function (connection) {
 
 //concat all of our client js files into one for the browser
 Routes["/application.js"] = function (connection) {
-  var client_js_files = ['client'];
+  var client_js_files = ['client', 'jquery.cookie'];
   var application_js = '';
 
   function concatFile(){
@@ -178,10 +178,18 @@ Users = {
 
   join: function(nick, session_id){
     var amendment = 1;
+    
+    if (this.sessions_nicks[session_id]) {
+      channel.leave(this.sessions_nicks[session_id]);
+      this.part(session_id);
+    }
+    
     while(nick in this.nicks_sessions){
       amendment = amendment + 1;
       nick = nick + amendment; //duplicate is aaron2 or aaron3 or so on
     }
+    
+    puts("Joined " + session_id + " with nick " + nick);
 
     this.nicks_sessions[nick] = session_id;
     this.sessions_nicks[session_id] = nick;

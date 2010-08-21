@@ -3,12 +3,17 @@
   var nick, session_id;
   var last_message_timestamp = 0; //get from server.
   
+  function html_escape(text) {
+    return $("<div></div>").text(text).html();
+  }
+  
   //join the room with the chosen nickname
   $(document).delegate('#nick', 'submit', function(event){
     event.preventDefault();
 
     nick = $('#nick input[type="text"]').val();
-    session_id = Math.random();
+    session_id = $.cookie('chat_session_id') || Math.random();
+    $.cookie('chat_session_id', session_id);
 
     $.get('/join', {nick:nick, session_id: session_id}, function(){
       $('#nick').hide();
@@ -44,7 +49,7 @@
           if(messages && messages.length)
             messagesRecieved(messages);
 
-          waitForNewMessages();          
+          setTimeout(waitForNewMessages, 500);
         }
       },
       error: function(XMLHttpRequest, textStatus){
@@ -55,6 +60,22 @@
           data: textStatus+' code recieved from server'
         }]);
         setTimeout(waitForNewMessages, 10000);
+      }
+    });
+    
+    $.ajax({
+      url: '/who',
+      success: function(nicks, textStatus, request) {
+        if (request.status !== 200)
+          this.error(request, textStatus);
+        else{
+          if(nicks && nicks.length) {
+            $("#channel ul").html("");
+            nicks.forEach(function(nick) {
+              $("#channel ul").append($("<li>" + nick + "</li>"));
+            });
+          }
+        }
       }
     });
   }
@@ -80,8 +101,8 @@
         '<li class="'+verb+'" title="'+verb+' at: '+date+'">'+
           '<div class="timestamp">'+stamp+'</div> '+
           '<div class="data">'+
-            '<div class="nick">'+messages[i].nick+'</div> '+
-            '<div class="message">'+ msg + '</div>'+
+            '<div class="nick">'+html_escape(messages[i].nick)+'</div> '+
+            '<div class="message"><pre>'+html_escape(msg)+'</pre></div>'+
             '<br/>'+
           '</div>'+
           '<br/>'+
